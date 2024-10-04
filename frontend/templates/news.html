@@ -2,8 +2,20 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Noticias</title>
+    <title>News</title>
+    <script src="https://cdn.socket.io/4.0.0/socket.io.min.js"></script>
+    <script>
+        var socket = io();
+        const userId = {{ user_id }};
+
+        // Escuchar eventos de recomendaciones
+        socket.on(`user_${userId}_recomendaciones`, function(data) {
+            const recommendationsList = document.getElementById('recommendations');
+            const newItem = document.createElement('li');
+            newItem.textContent = data.title; // Asegúrate de que 'data' tenga un campo 'title'
+            recommendationsList.appendChild(newItem);
+        });
+    </script>
 </head>
 <body>
     <h3><a href="{{ url_for('logout')}}"> Cerrar sesion </a></h3>
@@ -14,6 +26,11 @@
             <a href="{{ url_for('news_detail', news_id=news['id']) }}">{{ news['title'] }}</a>
         </li>
         {% endfor %}
+    </ul>
+
+    <h2>Recomendaciones</h2>
+    <ul id="recommendations">
+        <!-- Aquí se agregarán las recomendaciones en tiempo real -->
     </ul>
 </body>
 </html>

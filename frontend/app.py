@@ -1,18 +1,48 @@
 from datetime import datetime
 import json
 from flask import Flask, render_template, request, redirect, url_for, flash, session
+from flask_socketio import SocketIO
 import requests
 import redis
-
+from kafka import KafkaConsumer
 
 app = Flask(__name__)
+
+socketio = SocketIO(app)
+
 r = redis.Redis(host='redis', port=6379, db=0)
 
-
-app.secret_key = 'your_secret_key'
+app.secret_key = 'SECRET_KEY'
 
 # Backend URL
 BACKEND_URL = 'http://worker:5000'  # Asegúrate de que tu backend esté corriendo en este puerto
+
+# Conexión al servidor Kafka
+KAFKA_SERVER = 'kafka:9092'  # Asegúrate de que es el host y puerto correctos
+KAFKA_TOPIC_TEMPLATE = "user:{user_id}:news_views"
+
+recomendaciones_usuario = {}
+
+
+def consume_kafka_messages(user_id):
+    topic = KAFKA_TOPIC_TEMPLATE.format(user_id=user_id)
+    
+    consumer = KafkaConsumer(
+        topic,
+        bootstrap_servers=[KAFKA_SERVER],
+        auto_offset_reset='earliest',  # Desde el inicio del tópico
+        enable_auto_commit=True,
+        value_deserializer=lambda x: json.loads(x.decode('utf-8'))
+    )
+
+    for message in consumer:
+        print(f"Mensaje recibido del tópico {topic}: {message.value}")
+        recomendaciones_usuario[user_id] = recomendaciones_usuario.get(user_id, [])
+        recomendaciones_usuario[user_id].append(message.value)
+
+        socketio.emit(f'user_{user_id}_recomendaciones', message.value)
+
+
 
 # Ruta de registro
 @app.route('/register', methods=['GET', 'POST'])
@@ -72,11 +102,16 @@ def news():
         flash('Por favor inicia sesión.')
         return redirect(url_for('login'))
     
+    user_id = session['user_id']
+
     # Obtener lista de noticias desde el backend
     response = requests.get(f'{BACKEND_URL}/api/news')
     news_list = response.json() if response.status_code == 200 else []
+
+    consume_kafka_messages(user_id)  # Puedes usar threading para ejecutarlo en paralelo
+
     
-    return render_template('news.html', news_list=news_list)
+    return render_template('news.html', news_list=news_list, user_id=user_id)
 
 # Ruta para ver el detalle de una noticia
 @app.route('/news/<int:news_id>')

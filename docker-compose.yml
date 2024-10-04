@@ -55,19 +55,13 @@ services:
       - back-tier
 
   kafka:
-    image: confluentinc/cp-kafka:latest  # Usa la imagen actualizada de Confluent
+    image: wurstmeister/kafka:latest
     ports:
       - "9092:9092"
     environment:
-      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT
-      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092
       KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
-    depends_on:
-      - zookeeper
-    networks:
-      - back-tier
-  
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      
   spark:
     image: bitnami/spark:latest  # Cambia por la imagen que prefieras
     ports:
