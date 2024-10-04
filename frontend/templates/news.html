@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Noticias</title>
+</head>
+<body>
+    <h3><a href="{{ url_for('logout')}}"> Cerrar sesion </a></h3>
+    <h1>Noticias</h1>
+    <ul>
+        {% for news in news_list %}
+        <li>
+            <a href="{{ url_for('news_detail', news_id=news['id']) }}">{{ news['title'] }}</a>
+        </li>
+        {% endfor %}
+    </ul>
+</body>
+</html>

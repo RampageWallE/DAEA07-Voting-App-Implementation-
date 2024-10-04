@@ -1,17 +1,11 @@
-# Usa la imagen oficial de PostgreSQL como base
-FROM postgres:15-alpine
+# Dockerfile para MySQL
+FROM mysql:8.0
 
-# Configura variables de entorno para PostgreSQL (opcional)
-ENV POSTGRES_USER=postgres
-ENV POSTGRES_PASSWORD=postgres
-ENV POSTGRES_DB=votingapp
+# Copia tu script SQL al contenedor
+COPY init.sql /docker-entrypoint-initdb.d/
 
-# Copia los scripts de inicialización en el directorio de entrada de PostgreSQL
-# Estos scripts se ejecutan automáticamente cuando se inicializa la base de datos
-# COPY ./init.sql /docker-entrypoint-initdb.d/
-
-# Exponer el puerto de PostgreSQL
-EXPOSE 5432
-
-# Opcional: un punto de entrada personalizado o alguna configuración extra
-CMD ["postgres"]
+# Configuración de las variables de entorno
+ENV MYSQL_ROOT_PASSWORD=piero
+ENV MYSQL_DATABASE=DAEAlab08
+ENV MYSQL_USER=user1
+ENV MYSQL_PASSWORD=piero
