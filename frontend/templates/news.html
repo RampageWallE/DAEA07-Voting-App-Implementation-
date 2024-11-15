@@ -2,35 +2,105 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>News</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Noticias y Recomendaciones</title>
     <script src="https://cdn.socket.io/4.0.0/socket.io.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f9;
+            color: #333;
+        }
+        header {
+            background: #333;
+            color: #fff;
+            padding: 10px 0;
+            text-align: center;
+        }
+        header a {
+            color: #fff;
+            text-decoration: none;
+            font-size: 0.9em;
+        }
+        header a:hover {
+            text-decoration: underline;
+        }
+        main {
+            padding: 20px;
+        }
+        h1, h2 {
+            color: #007BFF;
+        }
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        ul li {
+            background: #fff;
+            margin: 10px 0;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        ul li a {
+            color: #007BFF;
+            text-decoration: none;
+            font-size: 1.1em;
+        }
+        ul li a:hover {
+            text-decoration: underline;
+        }
+        .recommendations {
+            margin-top: 20px;
+            background: #E9F5FF;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        .recommendations h2 {
+            margin-top: 0;
+        }
+    </style>
     <script>
-        var socket = io();
-        const userId = {{ user_id }};
+        document.addEventListener("DOMContentLoaded", () => {
+            var socket = io();
+            const userId = {{ user_id }};
 
-        // Escuchar eventos de recomendaciones
-        socket.on(`user_${userId}_recomendaciones`, function(data) {
-            const recommendationsList = document.getElementById('recommendations');
-            const newItem = document.createElement('li');
-            newItem.textContent = data.title; // Asegúrate de que 'data' tenga un campo 'title'
-            recommendationsList.appendChild(newItem);
+            // Escuchar eventos de recomendaciones
+            socket.on(`user_${userId}_recomendaciones`, function(data) {
+                const recommendationsList = document.getElementById('recommendations');
+                const newItem = document.createElement('li');
+                newItem.textContent = data.title; // Asegúrate de que 'data' tenga un campo 'title'
+                recommendationsList.appendChild(newItem);
+            });
         });
     </script>
 </head>
 <body>
-    <h3><a href="{{ url_for('logout')}}"> Cerrar sesion </a></h3>
-    <h1>Noticias</h1>
-    <ul>
-        {% for news in news_list %}
-        <li>
-            <a href="{{ url_for('news_detail', news_id=news['id']) }}">{{ news['title'] }}</a>
-        </li>
-        {% endfor %}
-    </ul>
+    <header>
+        <h1>Noticias y Recomendaciones</h1>
+        <a href="{{ url_for('logout') }}">Cerrar sesión</a>
+    </header>
+    <main>
+        <section>
+            <h2>Noticias</h2>
+            <ul>
+                {% for news in news_list %}
+                <li>
+                    <a href="{{ url_for('news_detail', news_id=news['id']) }}">{{ news['title'] }}</a>
+                </li>
+                {% endfor %}
+            </ul>
+        </section>
 
-    <h2>Recomendaciones</h2>
-    <ul id="recommendations">
-        <!-- Aquí se agregarán las recomendaciones en tiempo real -->
-    </ul>
+        <section class="recommendations">
+            <h2>Recomendaciones en Tiempo Real</h2>
+            <ul id="recommendations">
+                <!-- Aquí se agregarán las recomendaciones en tiempo real -->
+            </ul>
+        </section>
+    </main>
 </body>
 </html>

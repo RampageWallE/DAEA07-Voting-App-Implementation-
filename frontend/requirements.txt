@@ -2,3 +2,5 @@ Flask>=3.0.0
 requests>=2.28.1
 gunicorn>=23.0.0
 redis
+confluent-kafka
+flask_socketio

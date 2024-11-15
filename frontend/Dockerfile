@@ -31,4 +31,5 @@ COPY . .
 EXPOSE 8000
 
 # Define our command to be run when launching the container
-CMD ["gunicorn", "app:app", "-b", "0.0.0.0:8000"]
+# CMD ["gunicorn", "app:app", "-b", "0.0.0.0:8000", "--timeout", "300", "--access-logfile", "-", "--error-logfile", "-"]
+CMD ["python", "app.py"]

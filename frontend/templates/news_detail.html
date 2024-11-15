@@ -4,11 +4,101 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ news['title'] }}</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.0/socket.io.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            background-color: #f9f9f9;
+            color: #333;
+        }
+        header {
+            background: #333;
+            color: #fff;
+            padding: 10px 0;
+            text-align: center;
+        }
+        main {
+            padding: 20px;
+        }
+        h1, h2 {
+            margin: 10px 0;
+        }
+        a {
+            color: #007BFF;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+        .recommendations {
+            margin-top: 20px;
+            background: #fff;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        .recommendations h2 {
+            color: #007BFF;
+        }
+        .user-info {
+            margin-top: 10px;
+            padding: 15px;
+            border: 1px solid #007BFF;
+            border-radius: 8px;
+            background: #E9F5FF;
+        }
+        .user-info h3 {
+            margin: 0;
+            color: #333;
+        }
+        .user-info p {
+            margin: 5px 0;
+        }
+        .message {
+            margin-top: 10px;
+            font-style: italic;
+            color: #555;
+        }
+    </style>
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const socket = io("http://localhost:8000");
+
+            socket.on('recommendations', function(data) {
+                console.log("Recomendaciones recibidas:", data);
+
+                // Actualiza la interfaz con las recomendaciones
+                const userId = Object.keys(data)[0];
+                const userInfo = data[userId];
+
+                // Actualizando la información en la página
+                document.getElementById("username").innerText = `Usuario: ${userInfo.username}`;
+                document.getElementById("email").innerText = `Email: ${userInfo.email}`;
+                document.getElementById("message").innerText = "Este usuario comparte gustos similares a los tuyos. ¡Mira lo que le interesa!";
+            });
+        });
+    </script>
 </head>
 <body>
-    <span><h1>{{ news['title'] }}</h1></span> 
-    <h2>Vistas : {{ news['views'] }}</h2>
-    <p>{{ news['content'] }}</p>
-    <a href="{{ url_for('news') }}">Volver a la lista de noticias</a>
+    <header>
+        <h1>{{ news['title'] }}</h1>
+    </header>
+    <main>
+        <h2>Vistas: {{ news['views'] }}</h2>
+        <p>{{ news['content'] }}</p>
+        <a href="{{ url_for('news') }}">Volver a la lista de noticias</a>
+
+        <div class="recommendations">
+            <h2>Recomendaciones en Tiempo Real</h2>
+            <div class="user-info">
+                <h3 id="username">Usuario:</h3>
+                <p id="email">Email:</p>
+                <p class="message" id="message"></p>
+            </div>
+        </div>
+    </main>
 </body>
 </html>
